@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from . import schemas, models
+from . import schemas, models, utils
 
 def get_blog(db:Session, blog_id:int):
     return db.query(models.Blog).filter(models.Blog.id==blog_id).first()
@@ -34,3 +34,21 @@ def delete_blog(db:Session, blog_id:int):
         db.commit()
     else:
         raise Exception("blog not found")
+    
+
+##########
+###USER###
+##########
+
+
+def create_user(db:Session, user:schemas.User):
+    db_user = models.User(name=user.name, email=user.email, password=utils.Hash.bcrypt(user.password))
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def get_user_by_email(db:Session, user_email:str):
+    return db.query(models.User).filter(models.User.email==user_email).first()
+def get_user_by_id(db:Session, user_id:int):
+    return db.query(models.User).filter(models.User.id==user_id).first()
